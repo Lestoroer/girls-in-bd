@@ -1,0 +1,50 @@
+.users {
+	color: rgb(20, 20, 0);
+	font: 20px serif;
+}
+
+.item {
+	margin: 15px 0;
+	position: relative;
+}
+
+.item_wrapper {
+	display: block;
+}
+
+.wrapper_image {
+	overflow-x: scroll;
+	white-space: nowrap;
+}
+
+.item_number {
+	position: absolute;
+	top: 30px;
+	left: 15px;
+	font-size: 25px;
+	color: rgb(50, 50, 50);
+}
+
+.item_name {
+	margin: 5px 0;
+}
+
+.item_image {
+	width: auto;
+	height: 600px;
+	margin: 0px 5px;
+}
+
+.item_remove_user {
+	color: rgb(200,100,100);
+	cursor: pointer;
+	display: inline-block;
+}
+
+.user_button {
+	width: 150px;
+	padding: 10px;
+	background: rgb(100,160,100);
+	color: white;
+	cursor: pointer;
+}
