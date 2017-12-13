@@ -9,6 +9,7 @@ class Filters {
 		this.parameters = { 
             'fields' : `sex,last_seen,relation,country,bdate,city,home_town,can_write_private_message`,
             'search_sex' : 1,
+            'city' : 106,
             'min_age_to' : 19,
             'max_age_to' : 23,
             // 'search_age_from' : 17,
@@ -68,12 +69,12 @@ class Filters {
 	}
 
 	checkRelation(user) {
-		if (user['relation'] == (2 || 3 || 4 || 5 || 7 || 8)) return false;
+		if ([2,3,4,5,7,8].indexOf(user['relation']) != -1) return false;
 		return true;
 	}
 
 	checkSityAndTown(user) {
-		if (user['city'] == 2) return true;
+		if (user['city'] == this.parameters.city) return true;
 		if (!user['home_town']) return false;
 		let towns = `Спб, Питер, Санкт-петербург, СанктПетербург,
 					 Saint, Петербург, Петроград, Ленинград, ПЕТЕРБУРГ,

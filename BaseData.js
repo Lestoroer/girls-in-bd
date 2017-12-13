@@ -44,7 +44,6 @@ class BaseData {
 				if (error) return console.log(error);
 				/* Получаем массив групп.*/
 				this._groups_array = docs[0]._groups_array ? docs[0]._groups_array : [];
-				console.log(this._groups_array);
 			});
 		});
 	}

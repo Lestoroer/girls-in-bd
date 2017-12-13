@@ -16,7 +16,7 @@ class VkApi {
 		* значение 20, то код ничего не загрузит. Нужно указать 30 и тогда загрузятся оставшиеся 10.
 		* 
        */
-       this.req_groups_count = 20;
+       this.req_groups_count = 1;
 	}
 	// Делает запрос к vk api
 	request(url, parameters, callback) {
@@ -65,9 +65,9 @@ class VkApi {
 			return console.log("That's all");
 		}
 
-		this.users = filters.filterUsers(users);
-		baseData.recordArray('uid', this.users);
-		this.getAllMembers(group_id, count, count - offset);
+		// this.users = filters.filterUsers(users);
+		// baseData.recordArray('uid', this.users);
+		// this.getAllMembers(group_id, count, count - offset);
 		
 	}
 
@@ -80,11 +80,11 @@ class VkApi {
 	* @param|age_from {number}: возраст от
 	* @param|age_to {number}: возраст до
 	*/
-	searchUsers(_groups_array, _index_groups, age_from=17, age_to=17) {
+	searchUsers(_groups_array, _index_groups, age_from=filters.parameters.min_age_to, age_to=filters.parameters.min_age_to) {
 		this.request('users.search', { 
             count : 1000,
             group_id : _groups_array[_index_groups], // Получаем группу из массива групп
-            city : 2,
+            city : filters.parameters.city,
             sort : 1, // По дате регистрации
 			fields : filters.parameters.fields,
 			sex : filters.parameters.search_sex,
@@ -96,7 +96,7 @@ class VkApi {
 
 	handlerSearchUsers(_groups_array, _index_groups, age_from, age_to, respond) {
 		let users = respond.response;
-	
+
 		if (_index_groups >= _groups_array.length ||
 			_index_groups >= this.req_groups_count) return console.log('Thats all');
 
@@ -115,7 +115,8 @@ class VkApi {
 					Возвращаемые пользователи могут не соответствовать искомому возрасту, но он, как правило 
 					В диапазоне -+ 2 года. Таким образом, мы вытягиваем гораздо больше пользователей и знаем их
 					примерный возраст.
-				*/ 
+				*/
+				console.log(users.length);
 				users = filters.filterUsers(users, age_from);
 				if (users.length != 0) baseData.recordArray('uid', users);
 				/*  В фильтрах задаются параметры max_age_to, min_age_to
@@ -216,8 +217,9 @@ class VkApi {
 			let users = response.users;
 
 			if (groups.items.length > 0) {
+				console.log(groups.items.length); 
 				// Добавляем группы без дублирования id
-				baseData.update({_groups : '_groups'}, {$addToSet:  { groups_array: {$each : groups.items} }}, {upsert:true});
+				baseData.update({_groups : '_groups'}, {$addToSet:  { _groups_array: {$each : groups.items} }}, {upsert:true});
 			}
 			if (index == users_array.length - 1) return;
 		}
@@ -240,8 +242,8 @@ module.exports = vkapi;
 
 
 setTimeout( ()=>{
-	// vkapi.search(baseData._groups_array, baseData._index_groups);
-	// vkapi.getAllMembers(61560900);
+	vkapi.searchUsers(baseData._groups_array, baseData._index_groups);
+	//vkapi.getAllMembers(61560900);
 	// vkapi.getAllMembers(61560900);
 	// vkapi.getAllMembers(61560900);
 }, 600);
