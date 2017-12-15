@@ -26,18 +26,27 @@ app.engine('handlebars', exphbs({
 	}
 }));
 
-app.use(express.static(__dirname + "/public"));
+
+app.use(express.static(__dirname + "/public", {
+	etag: false,
+	setHeaders: function(res, path) {
+	    res.setHeader('Cache-Control', 'no-cache')
+	 },
+	 maxage: 0
+}));
+
 app.set('views', __dirname + '/views/layouts');
 app.set('view engine', 'handlebars');
 
 
 const filters = require('./Filters.js');
+const handlerError = require('./HandlerError.js');
 const baseData = require('./BaseData.js');
 const vkapi = require('./VkApi.js');
 const updater = require('./Updater.js');
 
 // Запускаем обновление users array
-updater.usersArray(1500);
+updater.usersArray(3000);
 
 
 app.get('/', function (req, res) {

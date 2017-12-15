@@ -18,9 +18,9 @@ let showed_element = 0;
 let will_show_users_count = users_count;
 
 function insertUsers(users_array) {
-	let html;
+	let html = '';
 
-	if (respond && will_show_users_count > users_array.length) will_show_users_count = users_array.length;
+	if (users_array && will_show_users_count > users_array.length) will_show_users_count = users_array.length;
 
 	for (let i = showed_element; i < will_show_users_count; i++) {
 		showed_element++;
@@ -33,7 +33,7 @@ function insertUsers(users_array) {
 		html += `</div>`;
 	}
 
-	js.get('.main').innerHTML = html;
+	js.get('.users').innerHTML = html;
 
 	
 }
@@ -47,20 +47,21 @@ function generateImage(users_array) {
 		// Теперь присылается объект с датой и ссылкой на картинку
 		// Этот код нужен для поддержки двух вариантов
 		if (typeof(users_array.photos[i]) == 'object') {
-			images += `
+			//<div class="item_image_wrapper">
+			//let date = moment(Date.now() - +users_array.photos[i].date).format("MMM Do YYYY");
+			//let date = new Date(Date.now() - +users_array.photos[i].date + 3600 * 24 * 60 * 30);
+			images+= `
 				<div class="item_image_wrapper">
 					<img class="item_image" src="${users_array.photos[i].src}"/>
-					<span class="item_image_date">${users_array.photos[i].date}</span>
+					<span class="item_image_date"></span>
 				</div>
 			`;
-		}
-		else {
-			images += `<img class="item_image" src="${users_array.photos[i]}"/>`;
 		}
 	}
 	images += '</div>';
 	return images;
 }
+
 
 function generateName(respond) {
 	return `<a class="item_name" href="https://vk.com/id${respond.uid}" target="_blank">

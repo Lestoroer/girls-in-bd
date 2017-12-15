@@ -5,15 +5,13 @@ class Filters {
 		this.groups_black_list = {
 
 		}
-
+		// Настройки запросов
 		this.parameters = { 
-            'fields' : `sex,last_seen,relation,country,bdate,city,home_town,can_write_private_message`,
+            'fields' : `sex,last_seen,relation,country,bdate,city,followers_count,home_town,can_write_private_message`,
             'search_sex' : 1,
-            'city' : 106,
-            'min_age_to' : 19,
+            'city' : 2, // 1 Москва, 2 Санкт-Петербург, 106 Оренбург
+            'min_age_to' : 18, // М
             'max_age_to' : 23,
-            // 'search_age_from' : 17,
-            // 'search_age_to' : 22,
             'search_has_photo' : 1
         }
 	}

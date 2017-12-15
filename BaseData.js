@@ -4,7 +4,7 @@ let MongoClient = require('mongodb').MongoClient
 
 class BaseData {
 	constructor() {
-		// Главный массив юзеров, от которого происходит рендеринг на фронтенд
+		// Главный массив юзеров, который рендерится на фронтенд
 		this.users_array = [];
 
 		let mongo_url = 'mongodb://127.0.0.1:27017/myproject';
@@ -28,12 +28,16 @@ class BaseData {
 				if (error) return console.log(error);
 				// Количество выгруженных пользователей с последней группы
 				this._members_count = docs[0]._members_count ? docs[0]._members_count  : 0;
-				// Последний индекс запроса групп
+				// Последний индекс запроса на группы
 				this._index_groups = docs[0]._index_groups ? docs[0]._index_groups : 0;
-				// Последний индекс запроса фото
+				// Последний индекс запроса на фото
 				this._index_photos = docs[0]._index_photos ? docs[0]._index_photos : 0;
-				// Последний индекс запроса подписчиков
+				// Последний индекс запроса интересеных страниц и групп
 				this._index_subscriptions = docs[0]._index_subscriptions ? docs[0]._index_subscriptions : 0;
+				// Последний индекс запроса на друзей
+				this._index_freinds = docs[0]._index_freinds ? docs[0]._index_freinds : 0;
+				// Последний индекс запроса на подписчиков пользователя
+				this._index_followers = docs[0]._index_followers ? docs[0]._index_followers : 0;
 			});
 		});
 	}

@@ -12,6 +12,11 @@
 	display: block;
 }
 
+.item_image_wrapper {
+	display: inline-block;
+	position: relative;
+}
+
 .wrapper_image {
 	overflow-x: scroll;
 	white-space: nowrap;
@@ -33,6 +38,12 @@
 	width: auto;
 	height: 600px;
 	margin: 0px 5px;
+}
+
+.item_image_date {
+	position: absolute;
+	top: 30px;
+	left: 30px;
 }
 
 .item_remove_user {
