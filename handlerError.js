@@ -3,7 +3,7 @@ class HandlerError {
 
 	}
 
-	on (error) {
+	on(error) {
 		switch(error.error_code) {
 			case 18:
 				return console.log(error.error_msg);

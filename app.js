@@ -46,7 +46,7 @@ const vkapi = require('./VkApi.js');
 const updater = require('./Updater.js');
 
 // Запускаем обновление users array
-updater.usersArray(3000);
+updater.usersArray(30000);
 
 
 app.get('/', function (req, res) {
@@ -67,4 +67,4 @@ app.post('/user_hidden', function (req, res) {
 	}
 });
 
-app.listen(3000);
+app.listen(5000);

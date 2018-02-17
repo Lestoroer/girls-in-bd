@@ -5,12 +5,20 @@ const handlerError = require('./HandlerError.js');
 const VK = require('VkApi');
 
 const vk = new VK({'mode' : 'oauth'});
-vk.setToken( { token :'38479c264a8d08779f0c74ba0f0ebf803700f92a2ac17d3a72c79ce819b0929b19c72711daab9efaadfba' });
+vk.setToken({ token :'38479c264a8d08779f0c74ba0f0ebf803700f92a2ac17d3a72c79ce819b0929b19c72711daab9efaadfba' });
+
+let tokens = [
+	'92cdb4adb94630af50163efbfc9e81083aa8840c7f6d5e80f36a5cbdbf7905f6ecc7e06984daa05cd9417',
+	'e2a49325b13f5c78bb4fa97d67b0bcb84651be2d97f9f1588ca257411fd931a6df2352725e673d8be51fc',
+	'2e483a1c4969b489939004f816ca74e31b890e05c3b3c4420718713f848a0cdb79823165b4c10e1f5ab6d'
+];
 
 class VkApi {
 	constructor() {
 		this.users; // Array юзеров
         this._handlers = {}; // Активные обработчики
+        this.error_count = 0;
+        this.token_count = 0;
 	}
 	// Делает запрос к vk api
 	request(url, parameters, callback) {
@@ -100,8 +108,11 @@ class VkApi {
 			/* Удаляем первый элемент массива, т.к. вк возвращает массив, где первый элемент это
 			   (количество групп)
 			*/
-			let users_count = users.unshift();
-			if (users_count != 0) {
+			users.unshift();
+			console.log('Count ' + users[0], 'TokenCount ' + this.token_count);
+			if (users[0] != 0) {
+				this.error_count = 0;
+
 				//??? Здесь нужно написать обработчик ошибки (когда нас забанили)
 				/*  Передаем age_from, чтобы записать возраст пользователя
 					Мы могли бы записать только возвращаемую вк дату: 'bdate', но этого недостаточно
@@ -112,7 +123,7 @@ class VkApi {
 					В диапазоне -+ 2 года. Таким образом, мы вытягиваем гораздо больше пользователей и знаем их
 					примерный возраст.
 				*/
-				console.log(users.length);
+				//console.log(users.length);
 				users = filters.filterUsers(users, age_from);
 				if (users.length != 0) baseData.recordArray('uid', users);
 				/*  В фильтрах задаются параметры max_age_to, min_age_to
@@ -127,24 +138,36 @@ class VkApi {
 					age_to = filters.parameters.min_age_to; age_from = filters.parameters.min_age_to;
 					_index_groups++;
 				}
-
-				this.requestTimeout(this.searchUsers.bind(this, _groups_array, _index_groups, age_from, age_to));
-				_groups_array = null;
-				users = null;
+			} else {
+				this.error_count++;
+				_index_groups++;
+				console.log('error_count', this.error_count);
+				if (this.error_count > 10) {
+					console.log('Установлен новый токен');
+					this.error_count = 0;
+					if (!tokens[this.token_count]) return console.log('Кончились токены!');
+					vk.setToken( { token : tokens[this.token_count] });
+					this.token_count++;
+					//vktokens[this.token_count];
+				}
 			}
-			return;
-		} 
-		return console.log('Ошибка запроса на получение пользователей');
+			this.requestTimeout(this.searchUsers.bind(this, _groups_array, _index_groups, age_from, age_to));
+			_groups_array = null;
+			users = null;
+		} else {
+			return console.log('Ошибка запроса на получение пользователей');
+		}
 	}
 
 	/*
 	 * Вытаскивает фото для каждого пользователя
 	 * Параметра offset нет, т.к. из-за ограничения движка vk, нам не могут отдать
-	 * кол-во чего-либо более, чем 1000, следовательно, он бессмыслен	* @param|_groups_array {array}: Массив id групп
-	 * @param|users {array}: Массив пользователей
-	 * @param|_index_photos {number}: Индекс запрашиваемого пользователя из массива
+	 * кол-во чего-либо более, чем 1000, следовательно, он бессмыслен	
+	 * @param _groups_array {array}: Массив id групп
+	 * @param users {array}: Массив пользователей
+	 * @param _index_photos {number}: Индекс запрашиваемого пользователя из массива
 	*/
-	getPhotos(users_array=baseData.users_array, _index_photos=baseData._index_photos) {
+	getPhotos(users_array=baseData.users_all_array, _index_photos=baseData._index_photos) {
 		this.request('photos.getAll', {
 			owner_id : users_array[_index_photos].uid, // Для каждого пользователя запрашиваем фотографии
 			//offset : offset,
@@ -190,7 +213,7 @@ class VkApi {
 		this.requestTimeout(this.getPhotos.bind(this, users_array, _index_photos));
 	}
 
-	getSubscriptions(users_array=baseData.users_array, 
+	getSubscriptions(users_array=baseData.users_all_array, 
 					 _index_subscriptions=baseData._index_subscriptions, offset, count) {
 		this.request('users.getSubscriptions', {
 			user_id : users_array[_index_subscriptions]['uid'],
@@ -221,7 +244,7 @@ class VkApi {
 		this.requestTimeout(this.getSubscriptions.bind(this, users_array, _index_subscriptions, offset, count));
 	}
 	// Получаем друзей пользователя
-	getFreinds(users_array=baseData.users_array, _index_freinds=baseData._index_freinds, offset, count) {
+	getFreinds(users_array=baseData.users_all_array, _index_freinds=baseData._index_freinds, offset, count) {
 		this.request('friends.get', {
 			user_id : users_array[_index_freinds]['uid'],
 			count : 1000,
@@ -229,10 +252,17 @@ class VkApi {
 	}
 
 	handlerFreinds(users_array, _index_freinds, offset, count, respond) {
+		if (respond.error) {
+			_index_freinds++;
+			this.requestTimeout(this.getFreinds.bind(this, users_array, _index_freinds, offset, count));
+			return handlerError.on(respond.error);
+		}
+
 		let response = respond.response;
 		if (_index_freinds >= users_array.length) return console.log('Thats all');
 
 		console.log(response.length, users_array[_index_freinds].uid);
+
 		if (response) {
 			let freinds = {count: response.length, people : response};
 			baseData.update({uid: users_array[_index_freinds].uid}, { $set: {'friends' : freinds}}, {upsert: true});
@@ -246,7 +276,7 @@ class VkApi {
 		this.requestTimeout(this.getFreinds.bind(this, users_array, _index_freinds, offset, count));
 	}
 	// Получаем подписчиков пользователя
-	getFollowers(users_array=baseData.users_array, _index_followers=baseData._index_followers, offset, count) {
+	getFollowers(users_array=baseData.users_all_array, _index_followers=baseData._index_followers, offset, count) {
 		this.request('users.getFollowers', {
 			user_id : users_array[_index_followers]['uid'],
 			count : 1000,
@@ -262,7 +292,7 @@ class VkApi {
 
 		let response = respond.response;
 		if (_index_followers >= users_array.length) return console.log('Thats all');
-		
+
 		console.log(response.count, users_array[_index_followers].uid);
 
 		if (response) {
@@ -282,7 +312,7 @@ class VkApi {
 	requestTimeout(callback) {
 		setTimeout(() => {
 			callback();
-		}, 350);
+		}, 270);
 	}
 }
 
@@ -291,13 +321,24 @@ module.exports = vkapi;
 
 // Ждем загрузки bd и делаем запросы
 setTimeout( ()=>{
-	//vkapi.searchUsers();
-	vkapi.getFollowers();
-	//vkapi.getPhotos();
-	//vkapi.getSubscriptions();
-	//vkapi.getFreinds();
-	//vkapi.getAllMembers(61560900);
-}, 5000);
+	baseData.users.find({
+		uid : {$exists: 1}, 
+	}).toArray((error, docs)=> {
+		baseData.users_all_array = docs;
+		//vkapi.getAllMembers(61560900);
+		//vkapi.searchUsers();
+		//vkapi.getFollowers();
+		//vkapi.getSubscriptions();
+		//vkapi.getFreinds();
+		vkapi.getPhotos();	
+	});
+}, 2500);
+
+
+// "_index_photos" : 33244,
+// "_index_subscriptions" : 37231,
+// "_index_freinds" : 34551,
+// "_index_followers" : 37773
 
 
 
@@ -408,8 +449,7 @@ function getGRAD() {
 function recalculateWeigth(GRAD, weigth) {
 	return E * GRAD + weigth * A;
 }
- 
-
+   
 
 
 

@@ -1,5 +1,5 @@
 let users_array = [];
-let users_count = 15;
+let users_count = 10;
 
 request.get('/users', (error, respond)=> {
 	if (error) return;
@@ -43,6 +43,7 @@ function generateImage(users_array) {
 	if (!users_array.photos) return images;
 	images += '<div class="wrapper_image">'
 	for (let i = 0; i < users_array.photos.length; i++) {
+		if (i == 29) break;
 		// Раньше я подгружал только картинку без даты (картинка была строка)
 		// Теперь присылается объект с датой и ссылкой на картинку
 		// Этот код нужен для поддержки двух вариантов
