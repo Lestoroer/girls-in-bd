@@ -330,7 +330,7 @@ setTimeout( ()=>{
 		//vkapi.getFollowers();
 		//vkapi.getSubscriptions();
 		//vkapi.getFreinds();
-		vkapi.getPhotos();	
+		//vkapi.getPhotos();	
 	});
 }, 2500);
 

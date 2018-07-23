@@ -376,6 +376,7 @@ class Filters {
 			'' : 1,
 			'' : 1,
 
+
 		}
 		this.groups_white_list = {
 			'31480508' : 1,
@@ -385,8 +386,8 @@ class Filters {
             'fields' : `sex,last_seen,relation,country,bdate,city,followers_count,home_town,can_write_private_message`,
             'search_sex' : 1,
             'city' : 2, // 1 Москва, 2 Санкт-Петербург, 106 Оренбург
-            'min_age_to' : 17, // М
-            'max_age_to' : 23,
+            'min_age_to' : 20, // М
+            'max_age_to' : 24,
             'search_has_photo' : 1
         }
 	}
@@ -476,7 +477,7 @@ class Filters {
 				else black_mark += 1;
 			}
 		}
-		return (black_mark < Math.ceil(groups.length * 0.017));
+		return (black_mark < Math.ceil(groups.length * 0.016));
 	}
 
 	escapeRegExp(str) {

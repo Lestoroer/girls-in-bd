@@ -46,7 +46,7 @@ const vkapi = require('./VkApi.js');
 const updater = require('./Updater.js');
 
 // Запускаем обновление users array
-updater.usersArray(30000);
+updater.usersArray(12000);
 
 
 app.get('/', function (req, res) {

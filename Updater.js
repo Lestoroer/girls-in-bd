@@ -11,12 +11,11 @@ class Updater {
 	}
 
 	usersArray (time) {
-
-		setInterval(()=> {
-			console.log('run');
+		setTimeout(()=> {
 			baseData.users.find({
 				uid : {$exists: 1}, 
 				hidden: {$exists: 0},
+				age: {$gte: 20, $lte: 23},
 				'followers.people' : { $exists: 1} ,
 				'friends.people' : { $exists: 1} ,
 				'groups' : { $exists: 1} ,
@@ -24,9 +23,9 @@ class Updater {
 				let array_new = [];
 				for (let i = 0; i < docs.length; i++) {
 					if (
-						docs[i].groups.length > 500 ||
-						docs[i].friends.count > 291 ||
-						docs[i].followers.count > 551 ||
+						docs[i].groups.length > 550 ||
+						docs[i].friends.count > 351 ||
+						docs[i].followers.count > 201 ||
 						!filters.checkUserByBlackList(docs[i].groups)) continue;
 
 					array_new.push(docs[i]);
@@ -36,8 +35,7 @@ class Updater {
 				array_new = null;
 				
 			});
-			
-		}, time);
+		}, 1000);
 	}
 }
 
